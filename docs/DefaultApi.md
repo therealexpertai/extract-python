@@ -1,6 +1,6 @@
 # openapi_client.DefaultApi
 
-All URIs are relative to *http://api.expert.ai/estratto/v1*
+All URIs are relative to *http://extract.expert.ai/beta*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -21,15 +21,15 @@ Asynchronous layout recognition.   Inside the `Location` header it returns the U
 
 ```python
 import time
-import openapi_client
+import openapi
 from expertai.extract.openapi.client.api import default_api
 from expertai.extract.openapi.client.model.layout_request import LayoutRequest
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://api.expert.ai/estratto/v1
+# Defining the host is optional and defaults to http://extract.expert.ai/beta
 # See configuration.py for a list of all supported configuration parameters.
-configuration = openapi_client.Configuration(
-    host="http://api.expert.ai/estratto/v1"
+configuration = openapi.client.Configuration(
+    host="https://extract.expert.ai/beta"
 )
 
 # The openapi must configure the authentication and authorization parameters
@@ -38,12 +38,12 @@ configuration = openapi_client.Configuration(
 # satisfies your auth use case.
 
 # Configure Bearer authorization (JWT): bearerAuth
-configuration = openapi_client.Configuration(
+configuration = openapi.client.Configuration(
     access_token='YOUR_BEARER_TOKEN'
 )
 
 # Enter a context with an instance of the API openapi
-with openapi_client.ApiClient(configuration) as api_client:
+with openapi.client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
     layout_request = LayoutRequest(None)  # LayoutRequest | The document to be analyzed (optional)
@@ -53,7 +53,7 @@ with openapi_client.ApiClient(configuration) as api_client:
     try:
         api_response = api_instance.layout_document_async_post(layout_request=layout_request)
         pprint(api_response)
-    except openapi_client.ApiException as e:
+    except openapi.client.ApiException as e:
         print("Exception when calling DefaultApi->layout_document_async_post: %s\n" % e)
 ```
 
@@ -105,15 +105,15 @@ Recognition task status or results.   Returns task progress information and, whe
 
 ```python
 import time
-import openapi_client
+import openapi
 from expertai.extract.openapi.client.api import default_api
 from expertai.extract import RecognitionTaskOutput
 from pprint import pprint
 
-# Defining the host is optional and defaults to http://api.expert.ai/estratto/v1
+# Defining the host is optional and defaults to http://extract.expert.ai/beta
 # See configuration.py for a list of all supported configuration parameters.
-configuration = openapi_client.Configuration(
-    host="http://api.expert.ai/estratto/v1"
+configuration = openapi.client.Configuration(
+    host="https://extract.expert.ai/beta"
 )
 
 # The openapi must configure the authentication and authorization parameters
@@ -122,12 +122,12 @@ configuration = openapi_client.Configuration(
 # satisfies your auth use case.
 
 # Configure Bearer authorization (JWT): bearerAuth
-configuration = openapi_client.Configuration(
+configuration = openapi.client.Configuration(
     access_token='YOUR_BEARER_TOKEN'
 )
 
 # Enter a context with an instance of the API openapi
-with openapi_client.ApiClient(configuration) as api_client:
+with openapi.client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
     task_id = "task-id_example"  # str | Recognition task ID
@@ -136,7 +136,7 @@ with openapi_client.ApiClient(configuration) as api_client:
     try:
         api_response = api_instance.status_task_id_get(task_id)
         pprint(api_response)
-    except openapi_client.ApiException as e:
+    except openapi.client.ApiException as e:
         print("Exception when calling DefaultApi->status_task_id_get: %s\n" % e)
 ```
 

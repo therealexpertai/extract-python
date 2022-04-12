@@ -108,11 +108,11 @@ Returns the status of the layout recognition task or, if the task is finished, t
 import time
 import expertai.extract.openapi.client
 from expertai.extract.openapi.client.api import default_api
-from expertai.estratto.openapi.client.model.recognition_task_output import RecognitionTaskOutput
+from expertai.extract.openapi.client.model.recognition_task_output import RecognitionTaskOutput
 from pprint import pprint
 # Defining the host is optional and defaults to http://extract.expert.ai/beta
 # See configuration.py for a list of all supported configuration parameters.
-configuration = expertai.estratto.openapi.client.Configuration(
+configuration = expertai.extract.openapi.client.Configuration(
     host = "http://extract.expert.ai/beta"
 )
 
@@ -122,12 +122,12 @@ configuration = expertai.estratto.openapi.client.Configuration(
 # satisfies your auth use case.
 
 # Configure Bearer authorization (JWT): bearerAuth
-configuration = expertai.estratto.openapi.client.Configuration(
+configuration = expertai.extract.openapi.client.Configuration(
     access_token = 'YOUR_BEARER_TOKEN'
 )
 
 # Enter a context with an instance of the API client
-with expertai.estratto.openapi.client.ApiClient(configuration) as api_client:
+with expertai.extract.openapi.client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = default_api.DefaultApi(api_client)
     task_id = "task-id_example" # str | Recognition task ID
@@ -136,7 +136,7 @@ with expertai.estratto.openapi.client.ApiClient(configuration) as api_client:
     try:
         api_response = api_instance.status_task_id_get(task_id)
         pprint(api_response)
-    except openapi_client.ApiException as e:
+    except expertai.extract.openapi.client.ApiException as e:
         print("Exception when calling DefaultApi->status_task_id_get: %s\n" % e)
 ```
 

@@ -26,7 +26,7 @@ class ExtractClient:
                 return api_instance.layout_document_async_post(layout_request=layout_request)
             except openapi_client.ApiException as e:
                 if e.status == 403:
-                    print("Your account does not have subscription for Estratto")
+                    print("Your account does not have subscription for Extract")
                 else:
                     print("Exception when calling DefaultApi->layout_document_async_post: %s\n" % e)
         raise Exception("Exception when call layout_document_async")

@@ -6,7 +6,7 @@ from expertai.extract.extract_client import ExtractClient
 
 class StatusTest(unittest.TestCase):
     def setUp(self):
-        self.estratto_client = ExtractClient(authorization_host="https://pe-nlapi-dev-developer.pe.cogitoapi.io/oauth2/token", host="https://pe-nlapi-dev-extract.pe.cogitoapi.io/beta")
+        self.extract_client = ExtractClient(authorization_host="https://pe-nlapi-dev-developer.pe.cogitoapi.io/oauth2/token", host="https://pe-nlapi-dev-extract.pe.cogitoapi.io/beta")
         self.file_path = "../resources/test.pdf"
         self.file_name = 'test.pdf'
         self.task_response = None
@@ -37,8 +37,8 @@ class StatusTest(unittest.TestCase):
                                 'state': 'SUCCESS'}
 
     def test_layout_document_task_id_response(self):
-        self.task_response = self.estratto_client.layout_document_async(file_path=self.file_path,
-                                                                        file_name=self.file_name)
+        self.task_response = self.extract_client.layout_document_async(file_path=self.file_path,
+                                                                       file_name=self.file_name)
         self.assertTrue(self.task_response['task_id'] is not None)
 
         if self.task_response is not None:
@@ -57,11 +57,11 @@ class StatusTest(unittest.TestCase):
         if control_number >= number:
             pytest.xfail('Can not get success response')
 
-        status_response = self.estratto_client.status(task_id)
+        status_response = self.extract_client.status(task_id)
         self.assertTrue(self.compare_responses(self.success_status_response, status_response))
 
     def status_state(self, task_id):
-        result = self.estratto_client.status(task_id)
+        result = self.extract_client.status(task_id)
         return result.get('state')
 
     def compare_responses(self, success_status_response, status_response):

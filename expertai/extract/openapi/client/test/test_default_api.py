@@ -1,7 +1,7 @@
 """
-    expert.ai Estratto
+    expert.ai Extract
 
-    Expert.ai Estratto provides layout recognition for PDF documents by detecting and extracting:  - Text with reading order - Titles and headings - Headers and footers - Tables - Document metadata - Pages count  The textual elements are returned together with the number of the page in which they occur and their bounding box.   # noqa: E501
+    Expert.ai Extract provides layout recognition for PDF documents by detecting and extracting:  - Text with reading order - Titles and headings - Headers and footers - Tables - Document metadata - Pages count  The textual elements are returned together with the number of the page in which they occur and their bounding box.   # noqa: E501
 
     The version of the OpenAPI document: v1
     Contact: api.inquiry@expert.ai
