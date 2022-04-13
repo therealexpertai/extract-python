@@ -3,7 +3,7 @@ Python client for expert.ai Extract.
 
 <a href="https://docs.expert.ai/extract/latest/" target="_blank">**Extract**</a> is expert.ai "document understanding" Cloud API.  
 It extracts text from PDF documents in a smart way: it detects pages and, inside them, headings, body-level text, tables, headers and footers. It returns all the blocks of text of each page in the same order in which a human would read them, so helping creating a stream of text than gives better results when applying Natural Language Processing (NLP).  
-Knowing where text occurs, e.g. inside a table's cell, helps improve the quality of information extraction task, which can have a more accurate scope.
+Knowing where text occurs, e.g. inside a table's cell, helps improve the quality of information extraction tasks because they can have a more accurate scope.
 
 ## Installation
 
@@ -43,11 +43,10 @@ You can then invoke the object methods to use expert.ai Extract API
 
 ### Methods
 
-
 **layout_document_async()**
 
 Use the `layout_document_async()` method to analyze a document.  
-The method correspond to the <a href="https://docs.expert.ai/extract/latest/reference/layout-document-async/" target="_blank">`layout-document-async`</a> API resource and it starts an asyncronous layout recognition task. It returns the ID of that task.
+The method corresponds to the <a href="https://docs.expert.ai/extract/latest/reference/layout-document-async/" target="_blank">`layout-document-async`</a> API resource and it starts an asyncronous layout recognition task. It returns the ID of that task.
 
 There are two possible syntaxes:
 
@@ -57,9 +56,9 @@ and:
 
 <pre><code>layout_document_async(file=<i>base64</i>, file_name=<i>fileName</i>)</code></pre>
 
-_`filePath`_ is the the path of the PDF file (including the file name), _`fileName`_ is the file name. _`base64`_ is the Base64 encoding of the PDF file.
+_`filePath`_ is the path of the PDF file (including the file name), _`fileName`_ is the file name. _`base64`_ is the Base64 encoding of the PDF file.
 
-_`fileName`_ is the name (not the path) of the PDF file. If you use the first syntax, you are free to set _`fileName`_ to a different value than the name of the file specified in _`filePath`_, since _`fileName`_ is more of a "document name", but if you don't have any special reason for doing so, use the same value.
+_`fileName`_ is only the name (not the path) of the PDF file. If you use the first syntax, you are free to set _`fileName`_ to a different value than the name of the file specified in _`filePath`_, since _`fileName`_ is more of a "document name", but if you don't have any special reason for doing so, use the same value.
 
 > Be aware of Extract limits: the maximum size of the PDF file you can analyze is 10MB and the document must have at most 500 pages.
 
@@ -87,9 +86,9 @@ where _`taskID`_ is the ID of the layout recognition task returned by the `layou
 
 The method returns an object with these properties:
 
-- `current` (int): the percentage completion of the task
-- `message` (str): the phase of the task, for example `"classification"`, `"completed"`
-- `result` (dict): results when the task is complete
+- `current` (int): percentage of completion of the task
+- `message` (str): phase of the task, for example `"page conversion"`, `"classification"`
+- `result` (dict): results (when the task is complete)
 - `state` (str): task status, for example `"PROGRESS"`, `"SUCCESS"`
 
 If `current` is 100, the task is finished and `result` contains the results.  
@@ -144,8 +143,8 @@ This example extends the previous to show how to print all the documents heading
 
 **Decoding and printing words**
 
-This example extends first to show how to decode and print the items of the `words` list.  
-Each item in that list contains all the words of a page, no matter the type of block in which they are, together with their bounding box. Words are useful when you need the complete stream of text in the correct reading order.  
+This example extends the first to show how to decode and print the items of the `words` list.  
+Each item in that list contains all the words of a page, no matter the type of block in which they are, together with their bounding box. Use words instead of layout items when you simply need all the text of a page (or document) in the correct reading order.  
 To make API output as compact as possible, words are returned compressed and Base64-encoded. Refer to <a href="https://docs.expert.ai/extract/latest/reference/results/#words" target="_blank">the documentation</a> to more about this representation.
 
     import time
