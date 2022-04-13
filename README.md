@@ -1,13 +1,9 @@
 # extract-python
-Python client for expert.ai Extract API. 
+Python client for expert.ai Extract. 
 
-Extract is an expert.ai Document-Understanding Service designed to transform documents with unstructured information,
-such as PDFs, images, Word documents into structured data.
-You can use this Python Client to add those capabilities to Python applications.
-
-[Useful link for Extract API](https://docs.expert.ai/extract/latest/)
-
-Our Python client provides a class whose methods get document and analyze it.
+<a href="https://docs.expert.ai/extract/latest/" target="_blank">**Extract**</a> is expert.ai "document understanding" Cloud API.  
+It extracts text from PDF documents in a smart way: it detects pages and, inside them, headings, body-level text, tables, headers and footers. It returns all the blocks of text of each page in the same order in which a human would read them, so helping creating a stream of text than gives better results when applying Natural Language Processing (NLP).  
+Knowing where text occurs, e.g. inside a table's cell, helps improve the quality of information extraction task, which can have a more accurate scope.
 
 ## Installation
 
@@ -25,16 +21,14 @@ conda install -c conda-forge expertai-extract
 
 ## Usage
 
-### Set credentials
-You need a developer account to use expert.ai Extract API.  
-Go on the [developer portal](https://developer.expert.ai/ui) and sign up.
-Expert.ai Extract API has a free trial, so you can use it for free for 60 days.  
-Your developer account credentials must be specified as environment variables:
+### Subcription and credentials
+Currently Extract is in Beta testing phase, so you have to <a href="mailto:extractbeta@expert.ai">contact expert.ai</a>, describe your use case and ask to participate in the test program.  
+If they say "yes", they will tell you what to do (you'll have to subscribe the Extract Beta plan from inside the developer portal) and then you can use Extract for free during the test phase.
 
-    EAI_USERNAME=YOUR_USERNAME
-    EAI_PASSWORD=YOUR_PASSWORD
+This Python client needs to know your expert.ai dveloper account credentials, so you'll have to set these two environment variables:
 
-Replace `YOUR_USERNAME` with the email address you specified during registration on the developer portal and `YOUR_PASSWORD` with the account password.
+    EAI_USERNAME
+    EAI_PASSWORD
 
 ### Create the client
 To use this client in your code, import the `ExtractClient` class:
@@ -49,246 +43,129 @@ You can then invoke the object methods to use expert.ai Extract API
 
 ### Methods
 
-ExtractClient class methods provides expert.ai Extract API capabilities.
 
-**Layout document asynchronous method**
+**layout_document_async()**
 
-Use `layout_document_async()` method to analyze document. The response contains task_id which can be used to see the state and result for this document.
+Use the `layout_document_async()` method to analyze a document.  
+The method correspond to the <a href="https://docs.expert.ai/extract/latest/reference/layout-document-async/" target="_blank">`layout-document-async`</a> API resource and it starts an asyncronous layout recognition task. It returns the ID of that task.
 
-    extractoClient.layout_document_async(file_path="your_pdf_file_path", file_name="pdf_file_name")
+There are two possible syntaxes:
 
-or
+<pre><code>layout_document_async(file_path=<i>filePath</i>, file_name=<i>fileName</i>)</code></pre>
 
-    extractClient.layout_document_async(file="your_file_encoded_in_base64", file_name="pdf_file_name")
+and:
 
-The response body contains task_id:
+<pre><code>layout_document_async(file=<i>base64</i>, file_name=<i>fileName</i>)</code></pre>
+
+_`filePath`_ is the the path of the PDF file (including the file name), _`fileName`_ is the file name. _`base64`_ is the Base64 encoding of the PDF file.
+
+_`fileName`_ is the name (not the path) of the PDF file. If you use the first syntax, you are free to set _`fileName`_ to a different value than the name of the file specified in _`filePath`_, since _`fileName`_ is more of a "document name", but if you don't have any special reason for doing so, use the same value.
+
+> Be aware of Extract limits: the maximum size of the PDF file you can analyze is 10MB and the document must have at most 500 pages.
+
+The method returns a dictionary containing an item with key `task_id` which value (a string) is the ID of the layout recognition task. 
+For example:
     
-    lda = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
-    taskId = lda["task_id"]
+    from expertai.extract.extract_client import ExtractClient
 
-The task_id must be used in subsequent calls.
+    extractClient = ExtractClient()
+
+    layoutRecognitionTask = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
+    taskId = layoutRecognitionTask["task_id"]
+
+You then have to call the `status()` method to know about the progress of that task and also to get results when the task is complete.
 
 **Status**
 
-Use `status()` method to get current document status of analyzed document.
+Use the `status()` method to know about the progress of a layout recognition task that was started with the `layout_document_async()` method and to get results when the task is complete. It corresponds to the <a href="https://docs.expert.ai/extract/latest/reference/status/" target="_blank">`status`</a> API resource.
 
-    extractClient.status(taskId)
+The syntax is:
 
-The response contains:
+<pre><code>status(<i>taskId</i>)</code></pre>
 
-`current` - the percentage completion of the task.
+where _`taskID`_ is the ID of the layout recognition task returned by the `layout_document_async()` method.
 
-`message` - indicating the phase of the task.
+The method returns an object with these properties:
 
-`result` - the object that contains the results.
+- `current` (int): the percentage completion of the task
+- `message` (str): the phase of the task, for example `"classification"`, `"completed"`
+- `result` (dict): results when the task is complete
+- `state` (str): task status, for example `"PROGRESS"`, `"SUCCESS"`
 
-`state` - the status of the task.
+If `current` is 100, the task is finished and `result` contains the results.  
+The structure of the `result` dictionary reflects that of the JSON object returned by the `status` resource of the API.  
+Refer to the <a href="https://docs.expert.ai/extract/latest/reference/results/" target="_blank">API documentation</a> or use the <a href="https://developer.expert.ai/ui/resources/extract/specification#" target="_blank">Swagger UI</a> in the developer portal to learn about the result structure.
 
-The response can be with state:
-- Progress:
-    ```
-  {
-       "current": 50, # index page currently in process
-       "message": "...", # detailed message about current state
-       "state": "PROGRESS" # task status
-  }
-  ```
-- Failure:
-    ```
-  {
-       "current": 0, # fix value
-       "message": "...", # error message
-       "state": "FAILURE" # task status
-  }
-  ```
-- Success:
-    ```
-  {
-       "current": 100, # fix value
-       "message": "completed", # fix message
-       "result": { result_data_from_analyze },
-       "state": "SUCCESS" # task status
-  }
-  ```
+## Examples
 
-## Successful end-of-task response
+**Basic usage**
 
-With successful task, finished without errors, the result JSON object contains:
-
-```
-"header": {
-	"conversionDateTime": "task end date and time",
-	"customInfo": {
-		"property 1 name": "property value",
-		"property 2 name": "property value",
-		...
-		"property n name": "property value",
-	},
-	"documentName": "document name",
-	"errorPages": number of pages that were not analyzed,
-	"totPages": total number of pages,
-	"version": "engine version",
-	"metadata": [
-		metadata object 1,
-		metadata object 2,
-		...
-		metadata object n
-	]
-},
-"layout": [
-	layout object 1,
-	layout object 2,
-	...
-	layout object n
-],
-"tableOfContent": [
-    {
-        "content": "...",
-        "layoutId": number of layout id,
-        "level": number of level,
-        "score": number of score,
-        "source": "source name"
-    },
-    ...
-    {
-        "content": "...",
-        "layoutId": number of layout id,
-        "level": number of level,
-        "score": number of score,
-        "source": "source name"
-    },
-],
-"words": [
-	"encoded page 1 words",
-	"encoded page 2 words",
-	...
-	"encoded page n words"
-]
-```
-
-**In header part**
-
-The `header` object contains information about the whole document.
-
-- conversionDateTime - `conversionDateTime` is the date and time the detection task ended.
-- customInfo - The properties of the `customInfo` object correspond to the properties of the PDF document.
-Most common properties are:
-
-  - `Author`: author
-  - `CreationDate`: creation date and time
-  - `Creator`: creator
-  - `ModDate`: last modification date and time
-  - `Producer`: generator application
-- documentName - `documentName` is the document name.
-- errorPages - `errorPages` is the number of pages that could not be analyzed.
-- totPages - `totPages` is the total number of pages.
-- version - `version`  is the version of the software module that performed the detection task.
-- metadata - `metadata` is an array of PDF metadata and it`s optional date that the PDF editor can insert into pages.
-
-**In layout part**
-
-`layout` is an array containing all the layout elements recognized in the document.  
-Every item correspond to a layout element.  
-The order of the elements in the array reflects the sequence of pages, so all the elements of page 1 are found first, then those of page 2, and so on.  
-Within the elements of a page, the first element represents the page itself and the other elements are blocks of text or tables. The position of text blocks and tables in the array corresponds to what Extract assumed to be the order in which a human would read them on the page.  
-Each item in the array is an object with these properties:
-
-- `id`: block ID. Every block of text as a unique ID which can be referenced in the `children` or in the `parent` properties of other blocks.
-- `page`: page number
-- `children`: list of child blocks. This property is an array, each item of which is the ID of an element that is hierarchically a child of this element. For example, the titles in a page are children of the page element, the cells of a table are the children of a table element.
-- `type`: element type, can be `page`, `title`, `text`, `header`, `footer`, `table` or `cell`.
-- `parent`: parent element ID. In the case of table cells (`type` set to `cell`), the value of this property is the ID of the table element, while for title, text, header and footer blocks is the page element. Page elements don't have this property.
-- `label`: element label. This is an experimental feature and must be ignored.
-- `content`: block text, this property is absent in page and table elements.
-- `bbox`: array containing the coordinates of the element's bounding box.
-
-	- item 0: upper left corner X
-	- item 1: upper left corner Y
-	- item 2: lower right corner X
-	- item 3: lower right corner Y
-	
-    Coordinates are in pixels and referred to a 100 DPI (dots per inch) rendering of the page. The coordinates origin is at the top left corner of the rendered page.
-
-- `row`: cell row number, only for cell elements (`type` set to `cell`).
-- `column`: cell column number, only for cell elements (`type` set to `cell`).
-- `isHead`: set to `true` if the cell is a column header. Only for cell elements (`type` set to `cell`).
-- `span`: cell span. It's an array of integer numbers. When present, the cell spans over more than one row and/or columns. The first item of the array is the row span, the second is the column span. Only for cell elements (`type` set to `cell`).
-
-**In part words**
-
-The `words` array contains one item per page and each item represents, in an encoded and compressed form, all the words present on the page.
-
-The value of the single item is encoded in Base64.  
-The decoded value is a byte array in gzip format.  
-The expanded byte array value is another byte array in which each word corresponds to a variable-length sequence of bytes with this structure:
-
-<pre><code><span class="bordered"><i>UTF-8 encoded text</i></span>0x00<span class="bordered"><i>Parent element ID</i></span><span class="bordered"><i>Bounding box coordinates</i></span></code></pre>
-
-## Examples with Extract Client
-
-**Layout document async method example**
+This example shows the basic usage of the client to start a recognition task, wait until it's finished and then print results.
 
     import time
     from expertai.extract.extract_client import ExtractClient
-    
+
     extractClient = ExtractClient()
-    
-    lda = extractClient.layout_document_async(file_path="your_pdf_file_path", file_name="file name")
-    taskId = lda["task_id"]
+
+    layoutRecognitionTask = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
+    taskId = layoutRecognitionTask["task_id"]
 
     status = extractClient.status(taskId)
 
-    while status.state == "PENDING" or status.state == "PROGRESS":
+    while status.state != "SUCCESS" and status.state != "FAILURE":
         print("Status: " + status.state + " ( " + str(status.current) + "% )")
-        time.sleep(2)
+        time.sleep(5)
         status = extractClient.status(taskId)
 
     print(status)
 
-**Titles concatenation example**
+**Printing titles**
+
+This example extends the previous to show how to print all the documents headings.
 
     import time
-    from expertai.extract.extracto_client import ExtractClient
-    
+    from expertai.extract.extract_client import ExtractClient
+
     extractClient = ExtractClient()
-    
-    layout_document = extractClient.layout_document_async(file_path="your_pdf_file_path",
-                                                           file_name="file name")
-    taskId = layout_document['task_id']
+
+    layoutRecognitionTask = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
+    taskId = layoutRecognitionTask["task_id"]
+
     status = extractClient.status(taskId)
-    
-    while status.state != "SUCCESS":
-        time.sleep(2)
+
+    while status.state != "SUCCESS" and status.state != "FAILURE":
+        print("Status: " + status.state + " ( " + str(status.current) + "% )")
+        time.sleep(5)
         status = extractClient.status(taskId)
     
-    titles = ""
-    
-    for el in status.result['layout']:
-        if el['type'] == 'title':
-            titles = titles + el['content']
-    
-    print(titles)
+    for layoutItem in status.result["layout"]:
+        if layoutItem["type"] == "title":
+            print(layoutItem["content"])
 
-**Words decoding example**
+**Decoding and printing words**
+
+This example extends first to show how to decode and print the items of the `words` list.  
+Each item in that list contains all the words of a page, no matter the type of block in which they are, together with their bounding box. Words are useful when you need the complete stream of text in the correct reading order.  
+To make API output as compact as possible, words are returned compressed and Base64-encoded. Refer to <a href="https://docs.expert.ai/extract/latest/reference/results/#words" target="_blank">the documentation</a> to more about this representation.
 
     import time
     import base64
     import gzip
-    
     from expertai.extract.extract_client import ExtractClient
-    
+
     extractClient = ExtractClient()
-    
-    layout_document = extractClient.layout_document_async(file_path="your_pdf_file_path", file_name="file name")
-    taskId = layout_document['task_id']
+
+    layoutRecognitionTask = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
+    taskId = layoutRecognitionTask["task_id"]
+
     status = extractClient.status(taskId)
-    
-    while status.state != "SUCCESS":
-        time.sleep(2)
+
+    while status.state != "SUCCESS" and status.state != "FAILURE":
+        print("Status: " + status.state + " ( " + str(status.current) + "% )")
+        time.sleep(5)
         status = extractClient.status(taskId)
     
-    words = status.result['words']
-    res = []
+    words = status.result["words"]
     
     for item in words:
         encoded = gzip.decompress(base64.standard_b64decode(item))
@@ -303,13 +180,8 @@ The expanded byte array value is another byte array in which each word correspon
             bbox = [int.from_bytes(encoded[i:i + 4], 'little') for i in range(index,
                                                                               index + 16, 4)]
             index += 16
-            res.append({
-                'text': text,
-                'index': index_elem,
-                'bbox': bbox,
-            })
+            
+            print(text, end=" ")
     
             # skip 4 elements of the array with byte 0
             index = index + 4
-    
-    print(res)
