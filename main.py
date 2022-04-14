@@ -1,7 +1,7 @@
 import time
 from expertai.extract.extract_client import ExtractClient
 
-extractClient = ExtractClient(authorization_host="https://pe-nlapi-dev-developer.pe.cogitoapi.io/oauth2/token", host="https://pe-nlapi-dev-extract.pe.cogitoapi.io/beta")
+extractClient = ExtractClient()
 
 lda = extractClient.layout_document_async(file_path="test/resources/test.pdf", file_name="test.pdf")
 taskId = lda["task_id"]

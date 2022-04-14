@@ -5,6 +5,7 @@ from expertai.extract.openapi.client.api import default_api
 from expertai.extract.openapi.client.model.layout_request import LayoutRequest
 import base64
 from expertai.extract.authentication import Authentication
+import json
 
 
 class ExtractClient:
@@ -17,19 +18,27 @@ class ExtractClient:
             encoded_string = base64.b64encode(pdf_file.read())
             return {"name": file_name, "data": encoded_string.decode('utf-8')}
 
-    def __layout_document_async_post_request(self, configuration, document):
-        with openapi_client.ApiClient(configuration) as api_client:
-            api_instance = default_api.DefaultApi(api_client)
-            layout_request = LayoutRequest(document)
+    def __check_exception(self, exception):
+        if exception.status == 403:
+            body = json.loads(exception.body)
+            message_failed = body["message"] + " - "
+            embedded = body["_embedded"]
+            errors = embedded["errors"]
+            for message in errors:
+                message_failed += message["message"] + "\n"
+            raise Exception(message_failed) from None
+        else:
+            raise Exception(exception) from None
 
-            try:
-                return api_instance.layout_document_async_post(layout_request=layout_request)
-            except openapi_client.ApiException as e:
-                if e.status == 403:
-                    print("Your account does not have subscription for Extract")
-                else:
-                    print("Exception when calling DefaultApi->layout_document_async_post: %s\n" % e)
-        raise Exception("Exception when call layout_document_async")
+    def __layout_document_async_post_request(self, configuration, document):
+        api_client = openapi_client.ApiClient(configuration)
+        api_instance = default_api.DefaultApi(api_client)
+        layout_request = LayoutRequest(document)
+
+        try:
+            return api_instance.layout_document_async_post(layout_request=layout_request)
+        except openapi_client.ApiException as e:
+            self.__check_exception(e)
 
     def layout_document_async(self, file=None, file_path=None, file_name=None):
         configuration = openapi_client.Configuration(
@@ -57,15 +66,12 @@ class ExtractClient:
             access_token=self.__authentication.get_access_token()
         )
 
-        with openapi_client.ApiClient(configuration) as api_client:
-            api_instance = default_api.DefaultApi(api_client)
+        api_client = openapi_client.ApiClient(configuration)
+        api_instance = default_api.DefaultApi(api_client)
 
-            try:
-                status = api_instance.status_task_id_get(task_id=task_id)
-                return status
-            except openapi_client.ApiException as e:
-                if e.status == 403:
-                    print("Your account does not have subscription for Extract")
-                else:
-                    print("Exception when calling DefaultApi->layout_document_async_post: %s\n" % e)
-        raise Exception("Exception when call layout_document_async")
+        try:
+            status = api_instance.status_task_id_get(task_id=task_id)
+            return status
+        except openapi_client.ApiException as e:
+            self.__check_exception(e)
+
