@@ -11,7 +11,7 @@
 from setuptools import setup, find_namespace_packages  # noqa: H301
 
 NAME = "expertai-extract"
-VERSION = "1.0.0"
+VERSION = "0.1.0"
 # To install the library, run the following
 #
 # python setup.py install
@@ -48,6 +48,5 @@ setup(
         'Intended Audience :: Education',
     ],
     long_description="""\
-    Expert.ai Extract provides layout recognition for PDF documents by detecting and extracting:  - Text with reading order - Titles and headings - Headers and footers - Tables - Document metadata - Pages count  The textual elements are returned together with the number of the page in which they occur and their bounding box.   # noqa: E501
-    """
+    Python client for expert.ai Extract. Extract pulls out text from PDF documents in a smart way, recognizing headings, tables, body text, headers and footers. It returns text elements, page by page, with their bounding boxes and in the same order a human would read them. Extract also return general document information and possible metadata."""
 )
