@@ -21,7 +21,8 @@ VERSION = "0.1.1"
 
 REQUIRES = [
     "urllib3 >= 1.25.3",
-    "python-dateutil",
+    "requests >= 2.27.1",
+    "python-dateutil >= 2.5.3",
 ]
 
 setup(
