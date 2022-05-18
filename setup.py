@@ -11,7 +11,7 @@
 from setuptools import setup, find_namespace_packages  # noqa: H301
 
 NAME = "expertai-extract"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 # To install the library, run the following
 #
 # python setup.py install
@@ -37,8 +37,6 @@ setup(
     install_requires=REQUIRES,
     packages=find_namespace_packages(include=["expertai.*"]),
     include_package_data=True,
-    license_files='LICENSE.txt',
-    license='Apache License 2.0',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
